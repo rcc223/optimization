@@ -57,29 +57,47 @@ int main(){
   end = clock();
   printf("%-5d\t%-10ld\t", N, (end-start));
   // case 2: Eliminating memory reference
-
+  start = clock();
+  multiply_no_mem(a, b, c);
+  end = clock();
+  printf("%-101d", (end-start));
   // case 3: loop unrolling 2x1
+  start = clock();
+  multiply_unroll_2_1(a, b, c);
+  end = clock();
+  printf("%d", (end-start));
+  // case 4: loop unrolling 2x2
 
-   // case 4: loop unrolling 2x2
+  // case 5: loop unrolling 4x1
 
-   // case 5: loop unrolling 4x1
+  // case 6: loop unrolling 4x4
 
-   // case 6: loop unrolling 4x4
+  // case 7: loop unrolling 8x1
 
-   // case 7: loop unrolling 8x1
+  // case 8: loop unrolling 8x8
 
-   // case 8: loop unrolling 8x8
-
+   printf("\n");
 }
 /* Definition of the function allocate_memory
 *  return a pointer to a two-dimensional array of size N x N
 */
 data_t** allocate_memory(){
-  return 0;
+  data_t** arr = (data_t**)malloc(sizeof(data_t*) * N);
+  for(int i = 0; i < N; i++) {
+    arr[i] = (data_t*)malloc(sizeof(data_t) * N);
+  }
+  
+  return arr;
 }
 // function to fill a matrix a[N][N] with random numbers
 void fillArray(data_t **a){
+  int i, j;
+  for(i = 0; i<N; i++) {
+    for(j=0; j<N; j++)
+      a[i][j] = (int)(rand() * 100);
+  }
 }
+
 // Matrix multiplication with no optimization
 void multiply_no_opt(data_t **a,data_t **b,data_t **c){
   int i, j,k;
@@ -91,14 +109,36 @@ void multiply_no_opt(data_t **a,data_t **b,data_t **c){
       }
     }
 }
+
 // Matrix multiplication with elimination
 // of memory reference when possible
 void multiply_no_mem(data_t **a,data_t **b,data_t **c){
-
+  int i, j, k, sum;
+  for(i=0; i<N; i++) {
+    for(j=0; j<N; j++) {
+      sum = 0;
+      for(k=0; k<N; k++) {
+        sum += a[i][k] * b[k][j];
+      }
+      c[i][j] = sum;
+    }
+  }
 }
+
 // Matrix multiplication with loop unrolling 2x1
 void multiply_unroll_2_1(data_t **a,data_t **b,data_t **c){
-
+  int i, j, k, sum;
+  for(i=0; i<N; i++) {
+    for(j=0; j<N; j++) {
+      c[i][j] = 0;
+      for(k=0; k<N-1; k+=2) {
+        c[i][j] += (a[i][k] * b[k][j]) + (a[i][k+1] * b[k+1][j]);
+      }
+      for(; k<N; k++) {
+        c[i][j] += a[i][k] * a[k][j]; 
+      }
+    }
+  }
 }
 // Matrix multiplication with loop unrolling 2x2
 void multiply_unroll_2_2(data_t **a,data_t **b,data_t **c){
